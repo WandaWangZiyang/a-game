@@ -7,43 +7,17 @@ const dots = []
 const factor = 0.01
 const count = 200
 const size = 500
-const height = 500
-const width = 500
-var inputData = []
-
-// request access to the user's microphone
-navigator.mediaDevices.getUserMedia({ audio: true })
-  .then(function(stream) {
-    // create an AudioContext
-    var audioContext = new AudioContext();
-
-    // create a MediaStreamAudioSourceNode
-    var source = audioContext.createMediaStreamSource(stream);
-
-    // create a scriptProcessorNode
-    var scriptProcessor = audioContext.createScriptProcessor(1024, 1, 1);
-
-    // connect the nodes
-    source.connect(scriptProcessor);
-    scriptProcessor.connect(audioContext.destination);
-
-    // handle the audio data in the scriptProcessorNode's onaudioprocess event
-    scriptProcessor.onaudioprocess = function(event) {
-      var inputBuffer = event.inputBuffer;
-      var inputData = inputBuffer.getChannelData(0);
-      
-      console.log(Math.abs(inputData[8])*1000);
-      // do something with the audio data here
-    };
-  })
-  .catch(function(error) {
-    console.log(error);
-  });
-
+let mic, fft;
 
 function setup() {
-  createCanvas(height, width);
+  createCanvas(windowWidth, windowHeight);
   background(0);
+
+  mic = new p5.AudioIn();
+  mic.start();
+  fft = new p5.FFT();
+  fft.setInput(mic);
+
   
   noiseDetail(2);
   colorMode(HSB, 100);
@@ -59,6 +33,9 @@ function setup() {
 }
 
 function draw() {
+  console.log(mic);
+  console.log(fft);
+  
   t = millis()/10000;
   x = y = millis()/2000;
   
@@ -132,5 +109,10 @@ class Dot {
     circle(this.pos.x, this.pos.y,(sin(this.prev.x)+cos(this.prev.y))*random(8));
     line(this.prev.x, this.prev.y, this.pos.x, this.pos.y);
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  background(0);
 }
   
