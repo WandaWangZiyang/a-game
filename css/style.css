@@ -52,7 +52,7 @@ button {
   position: relative;
   overflow: hidden;
   z-index: 1;
-  top: 20px;
+  top: 10px;
   left: 20px;
 }
 
