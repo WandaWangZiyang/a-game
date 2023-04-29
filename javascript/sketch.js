@@ -9,9 +9,9 @@ let e;
 let r;
 
 //
-var button;
+//var button;
 var isRunning = false;
-var button2;
+//var button2;
 var isRunning2 = false;
 
 //
@@ -25,16 +25,16 @@ function preload() {
 
 
 function setup() {
-	createCanvas(windowWidth*0.98, windowHeight*0.85);
+	createCanvas(windowWidth*0.98, windowHeight*0.8);
 			
 	background('rgb(0,0,0)');
 
 	 slider = createSlider(0.1, 2, 1, 0);
 	 slider.style('width', '300px');
-	 slider.style('height', '20px');
+	 slider.style('height', '30px');
 	 slider.style('position', 'absolute');
 	 slider.style('bottom', '40px');
-	 slider.style('left', '20px');
+	 slider.style('left', '32px');
 	 slider.style('z-index', '1');
 	 
 	mic = new p5.AudioIn();
