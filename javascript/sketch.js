@@ -1,118 +1,117 @@
-//Tide on Earth
-//2023/1/15
-//Ziyang Wang
-//Acknowledgements: https://openprocessing.org/sketch/1349248, https://openprocessing.org/sketch/1751832
+let mic; 
+let fft; 
+let samples; 
+let slider; 
 
-const dots = []
-const factor = 0.01
-const count = 200
-const size = 500
-let mic, fft;
+
+//new
+let e, r
+
+var button;
+var isRunning = false;
+
+var button2;
+var isRunning2 = false;
+
+var circles = [];
+var freq = 1024;
+var spectrum;
+
+function preload() {
+	img = loadImage('colour.png');
+}
+
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  background(0);
+	createCanvas(windowWidth, windowHeight);
+	background('rgb(0,0,0)');
 
-  mic = new p5.AudioIn();
-  mic.start();
-  fft = new p5.FFT();
-  fft.setInput(mic);
 
-  
-  noiseDetail(2);
-  colorMode(HSB, 100);
-  noFill();
-  
-  //tides' range 
-  radius = random(size * 0.5 / 2,size * 0.9 / 2);
+	slider = createSlider(0.1, 2, 1, 0);
+	slider.position(0, 29 * (height / 30));
+
+
 	
-  //tides' style
-  for (let i = 0; i < count; i++) {		
-	dots.push(new Dot(radius, [40,80], 220, random(5)));
-  }
+	mic = new p5.AudioIn();
+	mic.start();
+
+	fft = new p5.FFT(0, 256);
+	fft.setInput(mic);
+
+	ellipseMode(CENTER);
+
+	for (var i = 0; i < freq; i++) {
+		circles.push(new Circle());
+	}
 }
 
 function draw() {
-  console.log(mic);
-  console.log(fft);
-  
-  t = millis()/10000;
-  x = y = millis()/2000;
-  
-  prevX = x;
-  prevY = y;
-  
-  for(let n = 0; n < 100; n++){
-    //the earth's shape
-  	x = sin(t-2 * prevY)*cos(t-2 * prevX) - random(0.6,0.7) * cos(t-2 * prevX) * sin(t-2 *prevX);
-  	y = sin(t-2 * prevX)*cos(t-2 * prevY) - random(0.6,0.7) * cos(t-2 * prevY) * sin(t-2 *prevY);
-    
-    strokeWeight(1);
-    color(255);
-    
-    //draw the earth
-    point(radius * x + size/2, radius * y + size/2);
-    circle(radius * x + size/2, radius * y + size/2,(sin(x)+cos(y))*random(0.5));
+	if (isRunning2) {
+		background(0, 1);
+		spectrum = fft.analyze();
 
-    prevX = x;
-    prevY = y;
-    }
-    
-    //draw tides' wave
-  for (let i = 0; i < dots.length; i++) {
-	const dot = dots[i];
-	n = noise(dot.pos.x * factor, dot.pos.y * factor);
-	dot.update(n);
-	dot.draw();
+		for (var i = 0; i < freq; i++) {
+			var myDiam = map(spectrum[i], 0, 255, 0, 20);
+			var mySpeed = map(spectrum[i], 0, 255, 0, 50);
+			circles[i].speed = floor(mySpeed);
+			circles[i].diameter = floor(myDiam);
+			circles[i].display();
+			circles[i].move();
+		}
+	} else {
+		background(0, 8); 
+		samples = fft.analyze();
+		for (let i = 0; i < samples.length - 1; i++) {
+			if (i % 2 == 1) samples[i] *= -1; // Flips the y-pos
+			fill(255);
+			stroke(255)
+			// Draws circles from-left-to-right
+			point(map(i, 0, samples.length - 1, 0, width), (height / 2 + (samples[i] * slider.value())))
+
+			//new
+			stroke(255)
+			e = -random(Math.PI * 2);//draw a big circle
+			r = map(i, 0, samples.length - 1, width / 3, height / 3) * pow(random(), map(i, 0, samples.length - 1, 0.1, 0.2) - abs(e - Math.PI) / 10),
+				point(cos(e) * (r) + width / 2, sin(e) * r + height / 2);
+
+			if (isRunning) {
+				//small circle,change with miclevel 
+				micLevel = mic.getLevel();
+				stroke(map(i, 0, micLevel, 0, 255))
+				point(width / 2 + sin(i) * micLevel * samples[i] * slider.value() * 60, height / 2 + cos(i) * micLevel * samples[i] * slider.value() * 30);
+			}
+		}
+	}
+}
+
+
+
+function start() {
+	getAudioContext().resume()
+}
+
+   function toggleProgram() {
+ 	isRunning = !isRunning;
    }
-}
 
-class Dot {
-  constructor (radius, colorRange, brightness, alpha) {
-    const r = random(TWO_PI);
-	const x = width / 2 + sin(r) * radius;
-	const y = height / 2 + cos(r) * radius;
-	this.pos = createVector(x,y);
-	this.prev = createVector(x,y);
-	this.color = color(0);
-	this.deadCount = 0;
-	this.colorRange = colorRange;
-	this.alpha = alpha;
-	this.brightness = brightness;
-  }
-	
-  update(noize) {
-    this.radius = random(size * 0.5 / 2,size * 0.9 / 2)
-    
-    //let tides have different directions
-    this.v = p5.Vector.fromAngle(noize * TWO_PI + (this.deadCount * PI));
-	this.v.setMag(2.5);
-	this.color = color(map(noize, 0, 1, ...this.colorRange), 100, this.brightness, this.alpha);
-	this.prev = this.pos.copy();
-	this.pos = this.pos.add(this.v);
-		
-	if (dist(width/2, height/2, this.pos.x, this.pos.y) > this.radius + 2) {
-      this.deadCount++;
-    }
-  }
-	
-  draw() {
-    //set the range of the shape
-    if (dist(width / 2, height / 2, this.pos.x, this.pos.y) > this.radius ||dist(width / 2, height / 2, this.prev.x, this.prev.y) > this.radius) {
-      return;
-    }
-    
-    //let tides' stroke change
-    strokeWeight(sin(this.noize * TWO_PI + (this.deadCount * PI)))
-	stroke(this.color);
-    point(this.pos.x, this.pos.y);
-    circle(this.pos.x, this.pos.y,(sin(this.prev.x)+cos(this.prev.y))*random(8));
-    line(this.prev.x, this.prev.y, this.pos.x, this.pos.y);
-  }
-}
+   function toggleProgram2() {
+ 	background(0)
+ 	isRunning2 = !isRunning2;
+   }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  background(0);
+function Circle() {
+	this.x = random() * width;
+	this.y = random() * height;
+	this.diameter = 15 * slider.value();
+	this.color = img.get(this.x, this.y);
+	this.speed = 0;
+	this.move = function () {
+		this.x += random(-this.speed, this.speed);
+		this.y += random(-this.speed, this.speed);
+	}
+	this.display = function () {
+		stroke(this.color, 150);
+		fill(0, 0, 0, 0);
+		ellipse(this.x, this.y, this.diameter, this.diameter);
+	};
 }
-  

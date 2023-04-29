@@ -7,7 +7,7 @@ canvas {
 }
 
 body{
-  background: white;
+  background: black;
 }
 
 main{
@@ -26,7 +26,7 @@ main{
 /* Custom to match our canvas size */
 @media screen and (max-width: 500px) {
   body{
-    color: blue;
+    color: rgb(255, 255, 255);
   }
 }
 
@@ -42,4 +42,36 @@ canvas {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+button {
+  background-color: black;
+  color: white;
+  font-size: 12px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 10px;
+  text-transform: uppercase;
+  font-weight: bold;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  top: 20px;
+  left: 20px;
+}
+
+button:before {
+  content: "";
+  background: linear-gradient(90deg, #5d4dae, #52b4c8);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  z-index: -1;
+  transition: all 0.3s ease-in-out;
+}
+
+button:hover:before {
+  width: 100%;
 }
