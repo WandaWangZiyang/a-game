@@ -5,14 +5,16 @@ let slider;
 
 
 //new
-let e, r
+let e;
+let r;
 
+//
 var button;
 var isRunning = false;
-
 var button2;
 var isRunning2 = false;
 
+//
 var circles = [];
 var freq = 1024;
 var spectrum;
@@ -23,15 +25,18 @@ function preload() {
 
 
 function setup() {
-	createCanvas(windowWidth, windowHeight);
+	createCanvas(windowWidth*0.98, windowHeight*0.85);
+			
 	background('rgb(0,0,0)');
 
-
-	slider = createSlider(0.1, 2, 1, 0);
-	slider.position(0, 29 * (height / 30));
-
-
-	
+	 slider = createSlider(0.1, 2, 1, 0);
+	 slider.style('width', '300px');
+	 slider.style('height', '20px');
+	 slider.style('position', 'absolute');
+	 slider.style('bottom', '40px');
+	 slider.style('left', '20px');
+	 slider.style('z-index', '1');
+	 
 	mic = new p5.AudioIn();
 	mic.start();
 
@@ -59,7 +64,7 @@ function draw() {
 			circles[i].move();
 		}
 	} else {
-		background(0, 8); 
+		background(0, 5); 
 		samples = fft.analyze();
 		for (let i = 0; i < samples.length - 1; i++) {
 			if (i % 2 == 1) samples[i] *= -1; // Flips the y-pos
@@ -68,9 +73,9 @@ function draw() {
 			// Draws circles from-left-to-right
 			point(map(i, 0, samples.length - 1, 0, width), (height / 2 + (samples[i] * slider.value())))
 
-			//new
+			//Draw a big circle
 			stroke(255)
-			e = -random(Math.PI * 2);//draw a big circle
+			e = -random(Math.PI * 2);
 			r = map(i, 0, samples.length - 1, width / 3, height / 3) * pow(random(), map(i, 0, samples.length - 1, 0.1, 0.2) - abs(e - Math.PI) / 10),
 				point(cos(e) * (r) + width / 2, sin(e) * r + height / 2);
 
