@@ -11,6 +11,7 @@ let myAudio = document.getElementById("myAudio");
     var musicStarted = false;
     var canvas1 = true;
     var mode1 = true;
+
     // Create a button to start the audio
     var startButton = document.createElement('button');
     var musicButton = document.createElement('button');
@@ -46,6 +47,7 @@ let myAudio = document.getElementById("myAudio");
       }
     });
 
+      // Add a click event listener to the startButton
     musicButton.addEventListener('click', function () {
       if (musicStarted) {
         pauseMusic();
@@ -57,17 +59,15 @@ let myAudio = document.getElementById("myAudio");
         musicButton.textContent = 'Pause music';
         musicStarted = true;
       }
-    
-
     });
-    // Add a click event listener to the startButton
+
+    // Add a click event listener to the Buttons
     startButton.addEventListener('click', function () {
       start();
       document.body.removeChild(startButton);
       document.body.appendChild(musicButton);
       document.body.appendChild(switchButton);
       document.body.appendChild(changeModeButton);
-      //startButton.style.backgroundColor = "navy";
     });
 
     document.body.appendChild(startButton);

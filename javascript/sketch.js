@@ -4,17 +4,15 @@ let samples;
 let slider; 
 
 
-//new
+//for canvas 1's big circle
 let e;
 let r;
 
-//
-//var button;
+//for buttons
 var isRunning = false;
-//var button2;
 var isRunning2 = false;
 
-//
+//for canvas 1's mode
 var circles = [];
 var freq = 1024;
 var spectrum;
@@ -29,6 +27,7 @@ function setup() {
 			
 	background('rgb(0,0,0)');
 
+	//create a slider
 	 slider = createSlider(0.1, 2, 1, 0);
 	 slider.style('width', '300px');
 	 slider.style('height', '30px');
@@ -37,9 +36,9 @@ function setup() {
 	 slider.style('left', '32px');
 	 slider.style('z-index', '1');
 	 
+
 	mic = new p5.AudioIn();
 	mic.start();
-
 	fft = new p5.FFT(0, 256);
 	fft.setInput(mic);
 
@@ -52,6 +51,7 @@ function setup() {
 
 function draw() {
 	if (isRunning2) {
+		//for canvas 2
 		background(0, 1);
 		spectrum = fft.analyze();
 
@@ -64,8 +64,10 @@ function draw() {
 			circles[i].move();
 		}
 	} else {
+		//for canvas 1
 		background(0, 5); 
 		samples = fft.analyze();
+
 		for (let i = 0; i < samples.length - 1; i++) {
 			if (i % 2 == 1) samples[i] *= -1; // Flips the y-pos
 			fill(255);
@@ -95,6 +97,7 @@ function start() {
 	getAudioContext().resume()
 }
 
+//for buttons
    function toggleProgram() {
  	isRunning = !isRunning;
    }
@@ -104,6 +107,7 @@ function start() {
  	isRunning2 = !isRunning2;
    }
 
+//for canvas 2
 function Circle() {
 	this.x = random() * width;
 	this.y = random() * height;
